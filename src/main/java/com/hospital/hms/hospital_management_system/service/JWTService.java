@@ -40,14 +40,20 @@ public class JWTService {
         }
     }
 
-    public String generateToken(String username) {
+    public String generateToken(UserDetails userDetails) {
 
         Map<String, Object> claims = new HashMap<>();
 
+        String role = userDetails.getAuthorities()
+                .iterator()
+                .next()
+                .getAuthority();
+
+        claims.put("role", role);
+
         return Jwts.builder()
-                .claims()
-                .add(claims)
-                .subject(username)
+                .claims(claims)
+                .subject(userDetails.getUsername())
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(
                         new Date(
@@ -55,7 +61,6 @@ public class JWTService {
                                         + 1000 * 60 * 30
                         )
                 )
-                .and()
                 .signWith(getKey())
                 .compact();
     }
