@@ -1,6 +1,5 @@
 package com.hospital.hms.hospital_management_system.config;
 
-
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,94 +21,236 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 public class SecurityConfig {
-	
-	@Autowired
-	private JwtFilter jwtFilter;
 
-	
-	@Autowired
-	private UserDetailsService userDetailsService;
-	
+    @Autowired
+    private JwtFilter jwtFilter;
+
+    @Autowired
+    private UserDetailsService userDetailsService;
+
+
+    // =========================
+    // Password Encoder
+    // =========================
+
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
+
         return new BCryptPasswordEncoder(12);
     }
+
+
+    // =========================
+    // Security Configuration
+    // =========================
+
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http)
-            throws Exception {
+    public SecurityFilterChain securityFilterChain(
+            HttpSecurity http) throws Exception {
 
-        http.csrf(customizer -> customizer.disable());
-        
-        http.cors(Customizer.withDefaults());
+        http.csrf(
+                customizer ->
+                        customizer.disable()
+        );
 
-        http.authorizeHttpRequests(request -> request
-        		
 
-        		.requestMatchers("/register", "/login", "/doctors")
-        		.permitAll()
+        http.cors(
+                Customizer.withDefaults()
+        );
 
-        		        .requestMatchers("/admin/**")
-        		        .hasRole("ADMIN")
 
-        		        .requestMatchers("/doctor/**")
-        		        .hasRole("DOCTOR")
+        http.authorizeHttpRequests(
+                request -> request
 
-        		        .requestMatchers("/patient/**")
-        		        .hasRole("PATIENT")
 
-        		        .anyRequest()
-        		        .authenticated()
-        		);
+                // =========================
+                // PUBLIC ENDPOINTS
+                // =========================
+
+                .requestMatchers(
+                        "/register",
+                        "/register/doctor",
+                        "/register/patient",
+                        "/login"
+                )
+                .permitAll()
+
+
+                // =========================
+                // PUBLIC DOCTOR LIST
+                // =========================
+
+                .requestMatchers(
+                        "/doctors",
+                        "/doctors/{id}",
+                        "/doctors/{id}/image"
+                )
+                .permitAll()
+
+
+                // =========================
+                // LOGGED-IN DOCTOR PROFILE
+                // =========================
+
+                .requestMatchers(
+                        "/doctors/me"
+                )
+                .hasRole("DOCTOR")
+
+
+                // =========================
+                // APPOINTMENTS
+                // =========================
+
+                .requestMatchers(
+                        "/appoinments/**"
+                )
+                .authenticated()
+
+
+                // =========================
+                // ADMIN
+                // =========================
+
+                .requestMatchers(
+                        "/admin/**"
+                )
+                .hasRole("ADMIN")
+
+
+                // =========================
+                // DOCTOR
+                // =========================
+
+                .requestMatchers(
+                        "/doctor/**"
+                )
+                .hasRole("DOCTOR")
+
+
+                // =========================
+                // PATIENT
+                // =========================
+
+                .requestMatchers(
+                        "/patient/**"
+                )
+                .hasRole("PATIENT")
+
+
+                // =========================
+                // EVERYTHING ELSE
+                // =========================
+
+                .anyRequest()
+                .authenticated()
+
+        );
+
+
+        // JWT Filter
 
         http.addFilterBefore(
                 jwtFilter,
                 UsernamePasswordAuthenticationFilter.class
         );
-        http.httpBasic(Customizer.withDefaults());
+
+
+        // HTTP Basic
+
+        http.httpBasic(
+                Customizer.withDefaults()
+        );
+
 
         return http.build();
-}
+    }
+
+
+    // =========================
+    // Authentication Provider
+    // =========================
+
     @Bean
     public AuthenticationProvider authenticationProvider() {
+
         DaoAuthenticationProvider provider =
                 new DaoAuthenticationProvider();
 
-        provider.setPasswordEncoder(passwordEncoder());
-        provider.setUserDetailsService(userDetailsService);
+        provider.setPasswordEncoder(
+                passwordEncoder()
+        );
+
+        provider.setUserDetailsService(
+                userDetailsService
+        );
 
         return provider;
     }
+
+
+    // =========================
+    // Authentication Manager
+    // =========================
+
     @Bean
     public AuthenticationManager authenticationManager(
-            AuthenticationConfiguration config) throws Exception {
+            AuthenticationConfiguration config)
+            throws Exception {
 
         return config.getAuthenticationManager();
     }
+
+
+    // =========================
+    // CORS
+    // =========================
+
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
 
-        CorsConfiguration configuration = new CorsConfiguration();
+        CorsConfiguration configuration =
+                new CorsConfiguration();
+
 
         configuration.setAllowedOrigins(
-                List.of("http://localhost:5173")
+                List.of(
+                        "http://localhost:5173"
+                )
         );
 
+
         configuration.setAllowedMethods(
-                List.of("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                List.of(
+                        "GET",
+                        "POST",
+                        "PUT",
+                        "DELETE",
+                        "OPTIONS"
+                )
         );
+
 
         configuration.setAllowedHeaders(
                 List.of("*")
         );
 
-        configuration.setAllowCredentials(true);
+
+        configuration.setAllowCredentials(
+                true
+        );
+
 
         UrlBasedCorsConfigurationSource source =
                 new UrlBasedCorsConfigurationSource();
 
-        source.registerCorsConfiguration("/**", configuration);
+
+        source.registerCorsConfiguration(
+                "/**",
+                configuration
+        );
+
 
         return source;
     }
-    
 }

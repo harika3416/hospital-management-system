@@ -7,13 +7,44 @@ import lombok.Data;
 
 @Data
 public class AppoinmentResponse {
-	   private int id;
-	    private int patientId;
-	    private int doctorId;
-	    private LocalDate appointmentDate;
-	    private LocalTime appointmentTime;
-	    private String reasons;
-	    private String status;
-	}
+
+    private int id;
+
+    // =========================
+    // Patient Details
+    // =========================
+
+    private int patientId;
+
+    private String patientName;
+
+    private int patientAge;
+
+    private String patientGender;
+
+    private String patientPhone;
 
 
+    // =========================
+    // Doctor Details
+    // =========================
+
+    private int doctorId;
+
+    private String doctorName;
+
+    private String doctorSpecialization;
+
+
+    // =========================
+    // Appointment Details
+    // =========================
+
+    private LocalDate appointmentDate;
+
+    private LocalTime appointmentTime;
+
+    private String reasons;
+
+    private String status;
+}

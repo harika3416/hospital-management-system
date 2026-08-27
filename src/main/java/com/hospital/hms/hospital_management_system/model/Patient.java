@@ -1,6 +1,5 @@
 package com.hospital.hms.hospital_management_system.model;
 
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -16,20 +15,28 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Patient {
-	
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int id;
-	private String name;
-	private int age;
-	private String gender;
-	private String phone;
-	private String disease;
 
-	private String imageName;
-	private String imageType;
-	@Lob
-	@Column(columnDefinition = "LONGBLOB")
-	private byte[] imageData;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
 
+    private String name;
+
+    private String email;
+
+    private int age;
+
+    private String gender;
+
+    private String phone;
+
+    private String disease;
+
+    private String imageName;
+
+    private String imageType;
+
+    @Lob
+    @Column(columnDefinition = "LONGBLOB")
+    private byte[] imageData;
 }
